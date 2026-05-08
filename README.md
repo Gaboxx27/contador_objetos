@@ -1,410 +1,119 @@
 # contador_objetos
 
-`contador_objetos` es una librería de Python para analizar imágenes tomadas desde arriba.
+Librería en Python para segmentar, contar y caracterizar objetos en imágenes cenitales sobre una banda o superficie de trabajo, este proyecto corresponde al Proyecto 2, Segmentación y conteo de objetos en una banda o superficie de trabajo.
 
-La librería ayuda a:
-
-- separar los objetos del fondo
-- contar cuántos objetos hay
-- mostrar cada paso del procesamiento
-- obtener una tabla con datos de cada objeto
-
-Este proyecto corresponde al **Proyecto 2: Segmentación y conteo de objetos en una banda o superficie de trabajo**.
+La librería permite cargar imágenes de prueba, aplicar preprocesamiento, separar objetos del fondo, detectar regiones conectadas, contar objetos, obtener propiedades básicas y visualizar bordes y puntos candidatos a esquina.
 
 ---
 
-# ¿Qué hace la librería?
+## Objetivo
 
-La librería puede hacer lo siguiente:
+El objetivo de esta librería es procesar imágenes tomadas desde arriba para identificar objetos individuales sobre una superficie clara, separar el fondo de los objetos y obtener un conteo final fácil de interpretar.
 
-- cargar imágenes de prueba
-- convertir una imagen a escala de grises
-- aplicar un filtro para reducir ruido
-- mejorar el contraste de la imagen
-- convertir la imagen a blanco y negro con Otsu
-- limpiar la imagen usando morfología
-- separar los objetos por regiones
-- contar los objetos
-- marcar los objetos con cuadros y números
-- detectar bordes con Canny
-- detectar esquinas con Harris
+El sistema no se queda solo en una imagen binaria, también muestra una salida visual con cajas delimitadoras, centroides y el número total de objetos detectados.
 
 ---
 
-# Técnicas usadas
+## Características principales
 
-En este proyecto se usan estas técnicas:
-
-- escala de grises
-- filtro gaussiano
-- ecualización de histograma
-- umbralización de Otsu
-- morfología
-- componentes conectados
-- detección de bordes con Canny
-- detección de esquinas con Harris
-- conteo de objetos
+- Carga de imágenes demo incluidas en la librería
+- Conversión de imagen a escala de grises
+- Filtrado gaussiano para reducir ruido
+- Ecualización de histograma para mejorar contraste
+- Umbralización con Otsu para separar fondo y objetos
+- Operaciones morfológicas de apertura y cierre
+- Segmentación por componentes conectados
+- Conteo final de objetos detectados
+- Cálculo de propiedades básicas por objeto
+- Detección de bordes con Canny
+- Detección de puntos candidatos a esquina con Harris
+- Pipeline automático con `procesar_demo()`
 
 ---
 
-# Instalación desde GitHub
+## Instalación
 
-Para instalar la librería desde GitHub, abre CMD, PowerShell o la terminal de Visual Studio Code y escribe:
+La librería puede instalarse directamente desde GitHub usando `pip`.
 
 ```bash
-python -m pip install git+https://github.com/Gaboxx27/contador_objetos.git
+python -m pip install https://github.com/Gaboxx27/contador_objetos/archive/refs/heads/main.zip
 ```
 
-Si el repositorio tiene otro nombre, cambia esta parte:
+También puede instalarse clonando el repositorio.
 
 ```bash
-contador_objetos.git
-```
-
-por el nombre real del repositorio.
-
----
-
-# Actualizar la librería
-
-Si hiciste cambios en GitHub y quieres instalar la versión nueva, usa:
-
-```bash
-python -m pip install --upgrade --force-reinstall git+https://github.com/Gaboxx27/contador_objetos.git
+git clone https://github.com/Gaboxx27/contador_objetos.git
+cd contador_objetos
+python -m pip install .
 ```
 
 ---
 
-# Desinstalar la librería
+## Verificación rápida de instalación
 
-Para quitar la librería de tu computadora:
-
-```bash
-python -m pip uninstall contador_objetos
-```
-
-Cuando pregunte si deseas continuar, escribe:
+Después de instalar la librería, se puede verificar que el paquete funciona importando una función básica.
 
 ```bash
-y
+python -c "from contador_objetos import listar_imagenes_demo; print(listar_imagenes_demo())"
 ```
+
+Si la instalación fue correcta, la consola debe mostrar las imágenes demo disponibles, por ejemplo `img1`, `img2` e `img3`.
 
 ---
 
-# Probar que la instalación funcionó
+## Imágenes demo
 
-Crea un archivo llamado:
+La librería incluye imágenes de prueba para ejecutar el procesamiento sin necesidad de cargar archivos externos.
 
-```text
-test_instalacion.py
-```
-
-Dentro del archivo escribe:
+Las imágenes disponibles se pueden consultar con la función `listar_imagenes_demo()`.
 
 ```python
 from contador_objetos import listar_imagenes_demo
 
-print("Imágenes disponibles:", listar_imagenes_demo())
-```
+imagenes = listar_imagenes_demo()
 
-Luego ejecútalo:
-
-```bash
-python test_instalacion.py
-```
-
-Si todo está bien, debe aparecer algo parecido a esto:
-
-```text
-Imágenes disponibles: ['img1', 'img2', 'img3']
+print(imagenes)
 ```
 
 ---
 
-# Imágenes incluidas
+## Uso básico con pipeline automático
 
-La librería ya trae tres imágenes de prueba:
-
-```text
-img1
-img2
-img3
-```
-
-Estas imágenes sirven para probar la librería sin tener que buscar imágenes externas.
-
----
-
-# Uso paso por paso
-
-A continuación se muestra cómo usar cada función de la librería por separado.
-
-Esto es útil para entender qué hace cada parte del procesamiento.
-
----
-
-## Paso 1: cargar una imagen
+La forma más rápida de probar la librería es usando `procesar_demo()`, esta función ejecuta el flujo completo de procesamiento con una sola llamada.
 
 ```python
-from contador_objetos import cargar_imagen_demo, mostrar_imagen
+from contador_objetos import procesar_demo
 
-img_bgr, img_rgb, ruta = cargar_imagen_demo("img3")
+resultados = procesar_demo(
+    "img3",
+    area_minima=2000,
+    mostrar=True,
+    guardar_csv=False
+)
 
-print("Imagen cargada desde:", ruta)
-
-mostrar_imagen(img_rgb, "Paso 1: imagen original")
+print("Conteo final:", resultados["conteo"])
 ```
 
-### Explicación
-
-Esta función carga una imagen incluida en la librería.
-
-`img_bgr` es la imagen en formato BGR, que es el formato que usa OpenCV.
-
-`img_rgb` es la imagen en formato RGB, que sirve para mostrarla correctamente.
-
-`ruta` es la ubicación de la imagen dentro de la librería.
+En este ejemplo se procesa la imagen `img3`, se muestran las etapas visuales y no se guarda ningún archivo CSV.
 
 ---
 
-## Paso 2: convertir a escala de grises
+## Uso paso por paso para exposición
+
+También es posible usar cada función de forma independiente, siempre que se entregue la entrada correcta.
+
+El siguiente ejemplo muestra el flujo completo usado para la exposición del proyecto, no guarda imágenes, no guarda CSV y no imprime tablas completas.
 
 ```python
-from contador_objetos import convertir_a_gris, mostrar_comparacion
+# ============================================================
+# DEMOSTRACIÓN GENERAL DE LA LIBRERÍA contador_objetos
+# Proyecto 2, Segmentación y conteo de objetos
+# Versión para exposición
+# No guarda imágenes
+# No guarda CSV
+# No imprime tablas completas
+# ============================================================
 
-gray = convertir_a_gris(img_bgr)
-
-mostrar_comparacion(
-    img_rgb,
-    gray,
-    "Imagen original",
-    "Paso 2: escala de grises",
-    None,
-    "gray"
-)
-```
-
-### Explicación
-
-Este paso convierte la imagen a escala de grises.
-
-Esto facilita el análisis porque la imagen queda con una sola capa de intensidad.
-
----
-
-## Paso 3: aplicar filtro gaussiano
-
-```python
-from contador_objetos import filtrar_gaussiano, mostrar_imagen
-
-blur = filtrar_gaussiano(
-    gray,
-    kernel_size=5,
-    sigma=1
-)
-
-mostrar_imagen(
-    blur,
-    "Paso 3: filtro gaussiano",
-    cmap="gray"
-)
-```
-
-### Explicación
-
-Este filtro suaviza la imagen y ayuda a reducir ruido.
-
-`kernel_size=5` indica el tamaño del filtro.
-
-`sigma=1` indica qué tanto se suaviza la imagen.
-
----
-
-## Paso 4: mejorar contraste
-
-```python
-from contador_objetos import ecualizar_histograma, mostrar_comparacion
-
-gray_eq = ecualizar_histograma(blur)
-
-mostrar_comparacion(
-    blur,
-    gray_eq,
-    "Imagen filtrada",
-    "Paso 4: ecualización",
-    "gray",
-    "gray"
-)
-```
-
-### Explicación
-
-Este paso mejora el contraste de la imagen.
-
-Puede ayudar a separar mejor los objetos del fondo.
-
----
-
-## Paso 5: umbralización con Otsu
-
-```python
-from contador_objetos import umbralizar_otsu, mostrar_imagen
-
-umbral, binaria = umbralizar_otsu(
-    blur,
-    invertir=True
-)
-
-print("Umbral calculado por Otsu:", umbral)
-
-mostrar_imagen(
-    binaria,
-    "Paso 5: Otsu",
-    cmap="gray"
-)
-```
-
-### Explicación
-
-Este paso convierte la imagen a blanco y negro.
-
-Otsu calcula automáticamente el mejor valor para separar el fondo de los objetos.
-
-`invertir=True` se usa cuando los objetos son más oscuros que el fondo.
-
-Si los objetos son más claros que el fondo, se puede usar:
-
-```python
-invertir=False
-```
-
----
-
-## Paso 6: aplicar morfología
-
-```python
-from contador_objetos import aplicar_morfologia, mostrar_comparacion
-
-binaria_limpia = aplicar_morfologia(
-    binaria,
-    kernel_size=5,
-    apertura_iter=1,
-    cierre_iter=1
-)
-
-mostrar_comparacion(
-    binaria,
-    binaria_limpia,
-    "Otsu",
-    "Paso 6: morfología",
-    "gray",
-    "gray"
-)
-```
-
-### Explicación
-
-La morfología ayuda a limpiar la imagen binaria.
-
-La apertura elimina ruido pequeño.
-
-El cierre rellena huecos pequeños dentro de los objetos.
-
----
-
-## Paso 7: segmentación por regiones y conteo
-
-```python
-from contador_objetos import segmentar_componentes, mostrar_resultado_final
-
-resultado, conteo, tabla, labels = segmentar_componentes(
-    binaria_limpia,
-    img_rgb,
-    area_minima=2000
-)
-
-print("Conteo final:", conteo)
-print(tabla)
-
-mostrar_resultado_final(resultado, conteo)
-```
-
-### Explicación
-
-Este paso busca regiones conectadas en la imagen binaria.
-
-Cada región detectada se toma como un posible objeto.
-
-La función entrega cuatro cosas:
-
-- `resultado`: imagen con los objetos marcados
-- `conteo`: número total de objetos detectados
-- `tabla`: datos de cada objeto
-- `labels`: matriz interna con etiquetas de las regiones
-
----
-
-## Paso 8: detección de bordes con Canny
-
-```python
-from contador_objetos import detectar_bordes_canny, mostrar_imagen
-
-bordes = detectar_bordes_canny(
-    gray_eq,
-    umbral1=50,
-    umbral2=150
-)
-
-mostrar_imagen(
-    bordes,
-    "Paso 8: bordes con Canny",
-    cmap="gray"
-)
-```
-
-### Explicación
-
-Este paso detecta los bordes de los objetos.
-
-Sirve para observar mejor los límites de cada objeto.
-
----
-
-## Paso 9: detección de esquinas con Harris
-
-```python
-from contador_objetos import detectar_esquinas_harris, mostrar_imagen
-
-harris, harris_vis = detectar_esquinas_harris(
-    gray_eq,
-    img_rgb
-)
-
-mostrar_imagen(
-    harris_vis,
-    "Paso 9: esquinas con Harris"
-)
-```
-
-### Explicación
-
-Este paso detecta esquinas o puntos importantes en la imagen.
-
-Es útil cuando los objetos tienen formas no circulares, como llaves, tijeras, piezas industriales u objetos rectangulares.
-
----
-
-# Código completo paso por paso
-
-Crea un archivo llamado:
-
-```text
-test_paso_a_paso.py
-```
-
-y pega este código:
-
-```python
 from contador_objetos import (
     listar_imagenes_demo,
     cargar_imagen_demo,
@@ -418,396 +127,567 @@ from contador_objetos import (
     detectar_esquinas_harris,
     mostrar_imagen,
     mostrar_comparacion,
-    mostrar_resultado_final
+    mostrar_resultado_final,
+    procesar_demo
 )
 
-print("Imágenes disponibles:", listar_imagenes_demo())
 
-img_bgr, img_rgb, ruta = cargar_imagen_demo("img3")
-print("Imagen cargada desde:", ruta)
 
-mostrar_imagen(img_rgb, "Paso 1: imagen original")
 
-gray = convertir_a_gris(img_bgr)
 
-mostrar_comparacion(
-    img_rgb,
-    gray,
-    "Imagen original",
-    "Paso 2: escala de grises",
-    None,
-    "gray"
-)
 
-blur = filtrar_gaussiano(
-    gray,
-    kernel_size=5,
-    sigma=1
-)
 
-mostrar_imagen(
-    blur,
-    "Paso 3: filtro gaussiano",
-    cmap="gray"
-)
 
-gray_eq = ecualizar_histograma(blur)
 
-mostrar_comparacion(
-    blur,
-    gray_eq,
-    "Imagen filtrada",
-    "Paso 4: ecualización",
-    "gray",
-    "gray"
-)
+# ============================================================
+# FUNCIÓN PARA PAUSAR ENTRE ETAPAS
+# ============================================================
 
-umbral, binaria = umbralizar_otsu(
-    blur,
-    invertir=True
-)
+def pausar(mensaje="Presiona ENTER para continuar"):
+    # Esta pausa permite explicar cada etapa durante la exposición
+    input(f"\n{mensaje}")
 
-print("Umbral calculado por Otsu:", umbral)
 
-mostrar_imagen(
-    binaria,
-    "Paso 5: Otsu",
-    cmap="gray"
-)
 
-binaria_limpia = aplicar_morfologia(
-    binaria,
-    kernel_size=5,
-    apertura_iter=1,
-    cierre_iter=1
-)
 
-mostrar_comparacion(
-    binaria,
-    binaria_limpia,
-    "Otsu",
-    "Paso 6: morfología",
-    "gray",
-    "gray"
-)
 
-resultado, conteo, tabla, labels = segmentar_componentes(
-    binaria_limpia,
-    img_rgb,
-    area_minima=2000
-)
 
-print("Conteo final:", conteo)
-print(tabla)
 
-mostrar_resultado_final(resultado, conteo)
 
-bordes = detectar_bordes_canny(
-    gray_eq,
-    umbral1=50,
-    umbral2=150
-)
 
-mostrar_imagen(
-    bordes,
-    "Paso 8: bordes con Canny",
-    cmap="gray"
-)
+# ============================================================
+# FUNCIÓN PRINCIPAL
+# ============================================================
 
-harris, harris_vis = detectar_esquinas_harris(
-    gray_eq,
-    img_rgb
-)
+def main():
 
-mostrar_imagen(
-    harris_vis,
-    "Paso 9: esquinas con Harris"
-)
-```
+    # Encabezado de la demostración
+    print("====================================================")
+    print(" DEMOSTRACIÓN DE LA LIBRERÍA contador_objetos")
+    print(" Proyecto 2, Segmentación y conteo de objetos")
+    print("====================================================")
 
-Ejecuta el archivo con:
 
-```bash
-python test_paso_a_paso.py
+
+
+
+
+
+
+
+    # ========================================================
+    # 1, Verificación de la librería
+    # ========================================================
+
+    print("\n1, Verificación de la librería")
+    print("Se revisa si la librería puede listar sus imágenes demo")
+
+    # Se listan las imágenes incluidas dentro de la librería
+    imagenes = listar_imagenes_demo()
+
+    # Se muestran las imágenes disponibles
+    print("\nImágenes disponibles:")
+    print(imagenes)
+
+    # Si no hay imágenes demo, se detiene la ejecución
+    if len(imagenes) == 0:
+        print("\nNo se encontraron imágenes demo")
+        return
+
+    pausar()
+
+
+
+
+
+
+
+
+
+    # ========================================================
+    # 2, Selección y carga de imagen
+    # ========================================================
+
+    print("\n2, Carga de imagen")
+    print("Se usará img3 porque es la imagen principal del proyecto")
+
+    # Se selecciona la imagen principal de prueba
+    nombre_imagen = "img3"
+
+    # Se carga la imagen demo
+    # img_bgr se usa para procesamiento con OpenCV
+    # img_rgb se usa para visualización correcta con Matplotlib
+    # ruta contiene la ubicación del archivo
+    img_bgr, img_rgb, ruta = cargar_imagen_demo(nombre_imagen)
+
+    # Se muestra información básica de la imagen
+    print("\nImagen seleccionada:", nombre_imagen)
+    print("Ruta:", ruta)
+    print("Tamaño:", img_bgr.shape)
+
+    # Se muestra la imagen original
+    mostrar_imagen(
+        img_rgb,
+        "Paso 1, imagen original"
+    )
+
+    pausar()
+
+
+
+
+
+
+
+
+
+    # ========================================================
+    # 3, Conversión a escala de grises
+    # ========================================================
+
+    print("\n3, Conversión a escala de grises")
+    print("Se convierte la imagen de color a una sola capa de intensidad")
+
+    # Se convierte la imagen original a escala de grises
+    gray = convertir_a_gris(img_bgr)
+
+    # Se compara la imagen original contra la imagen en escala de grises
+    mostrar_comparacion(
+        img_rgb,
+        gray,
+        "Imagen original",
+        "Escala de grises",
+        None,
+        "gray"
+    )
+
+    pausar()
+
+
+
+
+
+
+
+
+
+    # ========================================================
+    # 4, Filtrado gaussiano
+    # ========================================================
+
+    print("\n4, Filtrado gaussiano")
+    print("Se reduce ruido pequeño y textura antes de segmentar")
+
+    # Se aplica filtrado gaussiano
+    # kernel_size define el tamaño del filtro
+    # sigma controla la intensidad del suavizado
+    blur = filtrar_gaussiano(
+        gray,
+        kernel_size=5,
+        sigma=1
+    )
+
+    # Se muestra la imagen filtrada
+    mostrar_imagen(
+        blur,
+        "Paso 3, filtrado gaussiano",
+        cmap="gray"
+    )
+
+    pausar()
+
+
+
+
+
+
+
+
+
+    # ========================================================
+    # 5, Ecualización de histograma
+    # ========================================================
+
+    print("\n5, Ecualización de histograma")
+    print("Se mejora el contraste para visualizar mejor diferencias de intensidad")
+    print("Esta imagen ecualizada se usará para bordes y esquinas, no para el conteo principal")
+
+    # Se aplica ecualización de histograma
+    # Esta etapa sirve para mostrar mejora de contraste
+    gray_eq = ecualizar_histograma(blur)
+
+    # Se compara imagen filtrada contra imagen ecualizada
+    mostrar_comparacion(
+        blur,
+        gray_eq,
+        "Imagen filtrada",
+        "Ecualización de histograma",
+        "gray",
+        "gray"
+    )
+
+    pausar()
+
+
+
+
+
+
+
+
+
+    # ========================================================
+    # 6, Umbralización con Otsu
+    # ========================================================
+
+    print("\n6, Umbralización con Otsu")
+    print("Se separan automáticamente los objetos del fondo")
+    print("Para evitar que los objetos se unan por la ecualización, Otsu se aplica sobre la imagen filtrada")
+
+    # IMPORTANTE:
+    # Se usa blur y no gray_eq
+    # Usar gray_eq puede resaltar demasiado texturas y unir regiones
+    # Usar blur ayuda a mantener mejor separados los objetos
+    umbral, binaria = umbralizar_otsu(
+        blur,
+        invertir=True
+    )
+
+    # Se muestra el umbral calculado automáticamente
+    print("\nUmbral calculado por Otsu:", umbral)
+
+    # Se muestra la máscara binaria
+    mostrar_imagen(
+        binaria,
+        "Paso 5, umbralización con Otsu",
+        cmap="gray"
+    )
+
+    pausar()
+
+
+
+
+
+
+
+
+
+    # ========================================================
+    # 7, Morfología
+    # ========================================================
+
+    print("\n7, Morfología")
+    print("Se limpia la máscara binaria con apertura y cierre")
+    print("La apertura elimina ruido pequeño y el cierre ayuda a rellenar huecos internos")
+
+    # Se aplica morfología sobre la imagen binaria
+    binaria_limpia = aplicar_morfologia(
+        binaria,
+        kernel_size=5,
+        apertura_iter=1,
+        cierre_iter=1
+    )
+
+    # Se compara la máscara de Otsu contra la máscara limpia
+    mostrar_comparacion(
+        binaria,
+        binaria_limpia,
+        "Otsu",
+        "Morfología, apertura y cierre",
+        "gray",
+        "gray"
+    )
+
+    pausar()
+
+
+
+
+
+
+
+
+
+    # ========================================================
+    # 8, Segmentación por componentes conectados
+    # ========================================================
+
+    print("\n8, Segmentación por componentes conectados")
+    print("Cada región blanca válida se interpreta como un objeto")
+    print("El parámetro area_minima evita contar ruido pequeño")
+
+    # Se segmentan las regiones conectadas
+    # resultado contiene la imagen con cajas y centroides
+    # conteo contiene el número de objetos detectados
+    # tabla contiene propiedades, pero no se imprimirá para no saturar la exposición
+    # labels contiene la matriz de etiquetas
+    resultado, conteo, tabla, labels = segmentar_componentes(
+        binaria_limpia,
+        img_rgb,
+        area_minima=2000
+    )
+
+    # Se imprime solo el conteo final
+    print("\nConteo final:", conteo)
+
+    # Se muestra la imagen final con cajas, centroides y número de objetos
+    mostrar_resultado_final(
+        resultado,
+        conteo
+    )
+
+    pausar()
+
+
+
+
+
+
+
+
+
+    # ========================================================
+    # 9, Detección de bordes con Canny
+    # ========================================================
+
+    print("\n9, Detección de bordes con Canny")
+    print("Se detectan contornos externos e internos de los objetos")
+    print("Esta etapa complementa el análisis geométrico")
+
+    # Se aplica Canny sobre la imagen ecualizada
+    # La ecualización ayuda a resaltar bordes y detalles
+    bordes = detectar_bordes_canny(
+        gray_eq,
+        umbral1=50,
+        umbral2=150
+    )
+
+    # Se muestra la imagen de bordes
+    mostrar_imagen(
+        bordes,
+        "Paso 8, detección de bordes con Canny",
+        cmap="gray"
+    )
+
+    pausar()
+
+
+
+
+
+
+
+
+
+    # ========================================================
+    # 10, Detección de esquinas con Harris
+    # ========================================================
+
+    print("\n10, Detección de esquinas con Harris")
+    print("Se detectan puntos candidatos a esquina o zonas de alta variación")
+    print("Esta etapa es complementaria, no se usa para el conteo principal")
+
+    # Se aplica Harris sobre la imagen ecualizada
+    # harris contiene la respuesta numérica del detector
+    # harris_vis contiene la imagen con puntos marcados
+    harris, harris_vis = detectar_esquinas_harris(
+        gray_eq,
+        img_rgb
+    )
+
+    # Se muestra la imagen con puntos candidatos a esquina
+    mostrar_imagen(
+        harris_vis,
+        "Paso 9, detección de esquinas con Harris"
+    )
+
+    pausar()
+
+
+
+
+
+
+
+
+
+    # ========================================================
+    # 11, Prueba del pipeline automático
+    # ========================================================
+
+    print("\n11, Prueba del pipeline automático")
+    print("Ahora se ejecuta el flujo completo usando una sola función")
+    print("Esta prueba demuestra que la librería también funciona de forma automática")
+
+    # Se ejecuta el pipeline completo sin guardar CSV
+    # mostrar=True permite ver las etapas generadas por la función procesar_demo
+    resultados_pipeline = procesar_demo(
+        nombre_imagen,
+        area_minima=2000,
+        mostrar=True,
+        guardar_csv=False
+    )
+
+    # Se imprime solo el conteo obtenido por el pipeline
+    print("\nConteo obtenido con procesar_demo:", resultados_pipeline["conteo"])
+
+    pausar()
+
+
+
+
+
+
+
+
+
+    # ========================================================
+    # 12, Prueba rápida con todas las imágenes demo
+    # ========================================================
+
+    print("\n12, Prueba rápida con todas las imágenes demo")
+    print("Esto demuestra que la librería no depende de una sola imagen")
+    print("Solo se mostrarán los conteos, no las tablas")
+
+    # Se recorre cada imagen demo disponible
+    for nombre in imagenes:
+
+        # Se procesa cada imagen sin mostrar resultados visuales
+        # Esto permite probar rápido que el pipeline funciona con todas
+        resultado_demo = procesar_demo(
+            nombre,
+            area_minima=2000,
+            mostrar=False,
+            guardar_csv=False
+        )
+
+        # Se imprime el conteo obtenido para cada imagen
+        print(f"Imagen {nombre}, conteo detectado: {resultado_demo['conteo']} objetos")
+
+
+
+
+
+
+
+
+
+    # ========================================================
+    # 13, Cierre de demostración
+    # ========================================================
+
+    print("\n====================================================")
+    print(" DEMOSTRACIÓN FINALIZADA CORRECTAMENTE")
+    print("====================================================")
+
+
+
+
+
+
+
+
+
+# ============================================================
+# EJECUCIÓN DEL PROGRAMA
+# ============================================================
+
+if __name__ == "__main__":
+    main()
 ```
 
 ---
 
-# Uso rápido: ejecutar todo el procesamiento
+## Explicación de funciones principales
 
-Si quieres ejecutar todo de una sola vez, usa `procesar_demo`.
+### `listar_imagenes_demo()`
 
-```python
-from contador_objetos import procesar_demo
+Muestra las imágenes de prueba disponibles dentro de la librería.
 
-resultados = procesar_demo(
-    "img3",
-    area_minima=2000,
-    mostrar=True,
-    guardar_csv=True,
-    ruta_csv="resultados_img3.csv"
-)
+### `cargar_imagen_demo(nombre_imagen)`
 
-print("Conteo obtenido:", resultados["conteo"])
-print(resultados["tabla"])
-```
+Carga una imagen demo incluida en el paquete y devuelve la imagen en formato BGR, RGB y su ruta.
 
----
+### `convertir_a_gris(imagen)`
 
-## ¿Qué hace `procesar_demo`?
+Convierte una imagen de color a escala de grises para simplificar el procesamiento.
 
-`procesar_demo` hace todo automáticamente:
+### `filtrar_gaussiano(imagen_gris, kernel_size, sigma)`
 
-1. Carga la imagen.
-2. Convierte a escala de grises.
-3. Aplica filtro gaussiano.
-4. Mejora el contraste.
-5. Aplica Otsu.
-6. Aplica morfología.
-7. Segmenta objetos.
-8. Cuenta objetos.
-9. Detecta bordes.
-10. Detecta esquinas.
-11. Muestra resultados.
-12. Guarda una tabla CSV si se solicita.
+Aplica suavizado gaussiano para reducir ruido y pequeñas variaciones de textura.
 
----
+### `ecualizar_histograma(imagen_gris)`
 
-# Usar otra imagen
+Mejora el contraste de la imagen mediante una transformación de intensidad.
 
-Para usar otra imagen incluida en la librería, cambia:
+### `umbralizar_otsu(imagen_gris, invertir=True)`
 
-```python
-cargar_imagen_demo("img3")
-```
+Calcula automáticamente un umbral para separar objetos y fondo, en el demo se usa sobre la imagen filtrada para evitar que los objetos se unan.
 
-por:
+### `aplicar_morfologia(imagen_binaria, kernel_size, apertura_iter, cierre_iter)`
 
-```python
-cargar_imagen_demo("img1")
-```
+Limpia la imagen binaria mediante apertura y cierre morfológico.
 
-o:
+### `segmentar_componentes(imagen_binaria, imagen_rgb, area_minima)`
 
-```python
-cargar_imagen_demo("img2")
-```
+Detecta regiones conectadas, cuenta objetos y genera una salida visual con cajas y centroides.
 
-También puedes usar:
+### `detectar_bordes_canny(imagen_gris, umbral1, umbral2)`
 
-```python
-procesar_demo("img1")
-procesar_demo("img2")
-procesar_demo("img3")
-```
+Detecta bordes externos e internos de los objetos.
+
+### `detectar_esquinas_harris(imagen_gris, imagen_rgb)`
+
+Detecta puntos candidatos a esquina o zonas de alta variación de intensidad.
+
+### `mostrar_imagen(imagen, titulo, cmap)`
+
+Muestra una imagen individual con un título.
+
+### `mostrar_comparacion(imagen1, imagen2, titulo1, titulo2, cmap1, cmap2)`
+
+Muestra dos imágenes lado a lado para comparar etapas del procesamiento.
+
+### `mostrar_resultado_final(resultado, conteo)`
+
+Muestra la salida final con cajas, centroides y conteo total.
+
+### `procesar_demo(nombre_imagen, area_minima, mostrar, guardar_csv)`
+
+Ejecuta el flujo completo de forma automática con una imagen demo.
 
 ---
 
-# Procesar una imagen externa
+## Resultado esperado
 
-También puedes usar una imagen que no esté incluida en la librería:
+Al ejecutar el script de demostración con la imagen `img3`, el sistema debe mostrar el procesamiento paso por paso y obtener el conteo final de objetos detectados.
 
-```python
-from contador_objetos import procesar_imagen
-
-resultados = procesar_imagen(
-    r"C:\Users\gabri\OneDrive\Escritorio\Proyecto vision 2 parcial\mi_imagen.jpg",
-    area_minima=2000,
-    mostrar=True,
-    guardar_csv=True,
-    ruta_csv="resultados_mi_imagen.csv"
-)
-
-print(resultados["conteo"])
-print(resultados["tabla"])
-```
+En la imagen principal del proyecto se espera detectar 9 objetos, siempre que la umbralización principal se aplique sobre la imagen filtrada `blur`.
 
 ---
 
-# Parámetros importantes
+## Limitaciones
 
-## `area_minima`
+El método funciona mejor cuando los objetos están separados y existe contraste claro entre objetos y fondo.
 
-Este parámetro evita que el programa cuente manchas pequeñas o ruido como si fueran objetos.
+Si los objetos están pegados, tienen sombras fuertes, reflejos, marcas de agua o texturas muy intensas, algunas regiones pueden unirse o dividirse incorrectamente.
 
-Ejemplo:
-
-```python
-area_minima=2000
-```
-
-Si cuenta ruido como objeto, aumenta el valor:
-
-```python
-area_minima=3000
-```
-
-Si elimina objetos reales, baja el valor:
-
-```python
-area_minima=1000
-```
+La detección de Harris puede marcar muchos puntos en objetos oxidados o con textura, por eso se usa como análisis complementario y no como método principal de conteo.
 
 ---
 
-## `invertir_otsu`
+## Autores
 
-Este parámetro controla si la imagen binaria se invierte.
-
-```python
-invertir=True
-```
-
-Se usa cuando los objetos son más oscuros que el fondo.
-
-```python
-invertir=False
-```
-
-Se usa cuando los objetos son más claros que el fondo.
+Juan Carlos Valadez Muñoz  
+Gabriel López Lariz  
+Andrés Eduardo Gloria Márquez
 
 ---
 
-# Resultados generados
+## Proyecto académico
 
-La librería puede generar:
+Asignatura, Visión Robótica  
+Carrera, Ingeniería Robótica  
+Mayo de 2026
 
-- imagen original
-- imagen en escala de grises
-- imagen filtrada
-- imagen con mejor contraste
-- imagen binaria con Otsu
-- imagen después de morfología
-- imagen con bordes
-- imagen con esquinas
-- imagen final con objetos numerados
-- tabla con propiedades de cada objeto
-
----
-
-# Tabla de propiedades
-
-La tabla contiene:
-
-- número de objeto
-- área en pixeles
-- posición X
-- posición Y
-- ancho
-- alto
-- centroide X
-- centroide Y
-- relación ancho/alto
-
-Para imprimir la tabla:
-
-```python
-print(tabla)
-```
-
-o:
-
-```python
-print(resultados["tabla"])
-```
-
----
-
-# Guardar resultados en CSV
-
-Si usas el procesamiento completo, puedes guardar la tabla en un archivo CSV:
-
-```python
-resultados = procesar_demo(
-    "img3",
-    guardar_csv=True,
-    ruta_csv="resultados_img3.csv"
-)
-```
-
-Ese archivo se puede abrir en Excel.
-
----
-
-# Requisitos
-
-La librería usa:
-
-- OpenCV
-- NumPy
-- Matplotlib
-- Pandas
-
-Normalmente estas dependencias se instalan automáticamente al instalar la librería desde GitHub.
-
-Si necesitas instalarlas manualmente, usa:
-
-```bash
-python -m pip install opencv-python numpy matplotlib pandas
-```
-
----
-
-# Errores comunes
-
-## Error: No module named contador_objetos
-
-Significa que la librería no está instalada en el Python que estás usando.
-
-Solución:
-
-```bash
-python -m pip install git+https://github.com/Gaboxx27/contador_objetos.git
-```
-
----
-
-## Error al cargar la imagen
-
-Revisa que la ruta sea correcta y que la imagen exista.
-
----
-
-## El conteo no coincide
-
-Puede ocurrir por:
-
-- objetos pegados
-- sombras fuertes
-- fondo con textura
-- bajo contraste
-- objetos muy pequeños
-- valor incorrecto de `area_minima`
-
-Puedes ajustar el valor de:
-
-```python
-area_minima
-```
-
----
-
-# Limitaciones
-
-La librería funciona mejor cuando:
-
-- los objetos están separados
-- el fondo es uniforme
-- hay contraste entre objetos y fondo
-- la imagen está tomada desde arriba
-
-Puede fallar cuando:
-
-- los objetos están pegados
-- hay sombras fuertes
-- hay reflejos
-- el fondo tiene muchas texturas
-- los objetos tienen colores muy parecidos al fondo
-
----
-
-# Autor
-
-Gabriel Lopez
-
-Proyecto desarrollado para la asignatura de procesamiento digital de imágenes.
