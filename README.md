@@ -1,6 +1,6 @@
 # contador_objetos
 
-Librería en Python para segmentar, contar y caracterizar objetos en imágenes cenitales sobre una banda o superficie de trabajo, este proyecto corresponde al Proyecto 2, Segmentación y conteo de objetos en una banda o superficie de trabajo.
+Librería en Python para segmentar, contar y caracterizar objetos en imágenes cenitales sobre una banda o superficie de trabajo, este proyecto corresponde al Proyecto 2, segmentación y conteo de objetos en una banda o superficie de trabajo.
 
 La librería permite cargar imágenes de prueba, aplicar preprocesamiento, separar objetos del fondo, detectar regiones conectadas, contar objetos, obtener propiedades básicas y visualizar bordes y puntos candidatos a esquina.
 
@@ -98,7 +98,7 @@ En este ejemplo se procesa la imagen `img3`, se muestran las etapas visuales y n
 
 ---
 
-## Uso paso por paso para exposición
+## Uso paso por paso
 
 También es posible usar cada función de forma independiente, siempre que se entregue la entrada correcta.
 
@@ -106,9 +106,9 @@ El siguiente ejemplo muestra el flujo completo usado para la exposición del pro
 
 ```python
 # ============================================================
-# DEMOSTRACIÓN GENERAL DE LA LIBRERÍA contador_objetos
+# EJEMPLO PASO A PASO DE LA LIBRERÍA contador_objetos
 # Proyecto 2, Segmentación y conteo de objetos
-# Versión para exposición
+# Este archivo muestra cómo usar la librería paso por paso
 # No guarda imágenes
 # No guarda CSV
 # No imprime tablas completas
@@ -139,13 +139,15 @@ from contador_objetos import (
 
 
 
+
 # ============================================================
-# FUNCIÓN PARA PAUSAR ENTRE ETAPAS
+# FUNCIÓN PARA HACER PAUSAS
 # ============================================================
 
 def pausar(mensaje="Presiona ENTER para continuar"):
-    # Esta pausa permite explicar cada etapa durante la exposición
+    # Esta pausa sirve para poder explicar cada paso antes de avanzar
     input(f"\n{mensaje}")
+
 
 
 
@@ -161,9 +163,9 @@ def pausar(mensaje="Presiona ENTER para continuar"):
 
 def main():
 
-    # Encabezado de la demostración
+    # Se muestra un título al iniciar el programa
     print("====================================================")
-    print(" DEMOSTRACIÓN DE LA LIBRERÍA contador_objetos")
+    print(" EJEMPLO PASO A PASO DE contador_objetos")
     print(" Proyecto 2, Segmentación y conteo de objetos")
     print("====================================================")
 
@@ -175,21 +177,22 @@ def main():
 
 
 
+
     # ========================================================
-    # 1, Verificación de la librería
+    # 1, Revisar que la librería funcione
     # ========================================================
 
     print("\n1, Verificación de la librería")
-    print("Se revisa si la librería puede listar sus imágenes demo")
+    print("Primero se revisa si la librería encuentra sus imágenes de prueba")
 
-    # Se listan las imágenes incluidas dentro de la librería
+    # Se buscan las imágenes que vienen incluidas en la librería
     imagenes = listar_imagenes_demo()
 
-    # Se muestran las imágenes disponibles
+    # Se muestran las imágenes encontradas
     print("\nImágenes disponibles:")
     print(imagenes)
 
-    # Si no hay imágenes demo, se detiene la ejecución
+    # Si no se encuentran imágenes, el programa se detiene
     if len(imagenes) == 0:
         print("\nNo se encontraron imágenes demo")
         return
@@ -204,23 +207,24 @@ def main():
 
 
 
+
     # ========================================================
-    # 2, Selección y carga de imagen
+    # 2, Cargar una imagen
     # ========================================================
 
     print("\n2, Carga de imagen")
     print("Se usará img3 porque es la imagen principal del proyecto")
 
-    # Se selecciona la imagen principal de prueba
+    # Aquí se elige la imagen que se va a usar
     nombre_imagen = "img3"
 
-    # Se carga la imagen demo
-    # img_bgr se usa para procesamiento con OpenCV
-    # img_rgb se usa para visualización correcta con Matplotlib
-    # ruta contiene la ubicación del archivo
+    # Se carga la imagen desde la librería
+    # img_bgr se usa para trabajar la imagen internamente
+    # img_rgb se usa para mostrar la imagen con colores correctos
+    # ruta guarda la ubicación de la imagen
     img_bgr, img_rgb, ruta = cargar_imagen_demo(nombre_imagen)
 
-    # Se muestra información básica de la imagen
+    # Se muestra información básica de la imagen cargada
     print("\nImagen seleccionada:", nombre_imagen)
     print("Ruta:", ruta)
     print("Tamaño:", img_bgr.shape)
@@ -241,17 +245,18 @@ def main():
 
 
 
+
     # ========================================================
-    # 3, Conversión a escala de grises
+    # 3, Convertir a escala de grises
     # ========================================================
 
     print("\n3, Conversión a escala de grises")
-    print("Se convierte la imagen de color a una sola capa de intensidad")
+    print("La imagen se convierte a blanco y negro para trabajarla más fácil")
 
     # Se convierte la imagen original a escala de grises
     gray = convertir_a_gris(img_bgr)
 
-    # Se compara la imagen original contra la imagen en escala de grises
+    # Se muestra la imagen original junto a la imagen en gris
     mostrar_comparacion(
         img_rgb,
         gray,
@@ -271,23 +276,24 @@ def main():
 
 
 
+
     # ========================================================
-    # 4, Filtrado gaussiano
+    # 4, Aplicar filtro gaussiano
     # ========================================================
 
     print("\n4, Filtrado gaussiano")
-    print("Se reduce ruido pequeño y textura antes de segmentar")
+    print("Este paso suaviza la imagen para reducir detalles pequeños que pueden estorbar")
 
-    # Se aplica filtrado gaussiano
-    # kernel_size define el tamaño del filtro
-    # sigma controla la intensidad del suavizado
+    # Se aplica un filtro para suavizar la imagen
+    # kernel_size indica qué tan grande será el filtro
+    # sigma ayuda a controlar qué tanto se suaviza
     blur = filtrar_gaussiano(
         gray,
         kernel_size=5,
         sigma=1
     )
 
-    # Se muestra la imagen filtrada
+    # Se muestra la imagen después del filtro
     mostrar_imagen(
         blur,
         "Paso 3, filtrado gaussiano",
@@ -304,19 +310,19 @@ def main():
 
 
 
+
     # ========================================================
-    # 5, Ecualización de histograma
+    # 5, Mejorar contraste
     # ========================================================
 
     print("\n5, Ecualización de histograma")
-    print("Se mejora el contraste para visualizar mejor diferencias de intensidad")
-    print("Esta imagen ecualizada se usará para bordes y esquinas, no para el conteo principal")
+    print("Este paso ayuda a que se noten mejor algunas diferencias de brillo")
+    print("Esta imagen se usará para bordes y esquinas, no para el conteo principal")
 
-    # Se aplica ecualización de histograma
-    # Esta etapa sirve para mostrar mejora de contraste
+    # Se mejora el contraste de la imagen filtrada
     gray_eq = ecualizar_histograma(blur)
 
-    # Se compara imagen filtrada contra imagen ecualizada
+    # Se compara la imagen filtrada con la imagen mejorada
     mostrar_comparacion(
         blur,
         gray_eq,
@@ -336,27 +342,26 @@ def main():
 
 
 
+
     # ========================================================
-    # 6, Umbralización con Otsu
+    # 6, Separar objetos del fondo
     # ========================================================
 
     print("\n6, Umbralización con Otsu")
-    print("Se separan automáticamente los objetos del fondo")
-    print("Para evitar que los objetos se unan por la ecualización, Otsu se aplica sobre la imagen filtrada")
+    print("Aquí se separan los objetos del fondo de forma automática")
+    print("Se usa la imagen filtrada para evitar que algunos objetos se junten por error")
 
-    # IMPORTANTE:
-    # Se usa blur y no gray_eq
-    # Usar gray_eq puede resaltar demasiado texturas y unir regiones
-    # Usar blur ayuda a mantener mejor separados los objetos
+    # Se aplica Otsu sobre blur y no sobre gray_eq
+    # Esto ayuda a que los objetos queden mejor separados
     umbral, binaria = umbralizar_otsu(
         blur,
         invertir=True
     )
 
-    # Se muestra el umbral calculado automáticamente
+    # Se muestra el valor que Otsu calculó automáticamente
     print("\nUmbral calculado por Otsu:", umbral)
 
-    # Se muestra la máscara binaria
+    # Se muestra la imagen donde los objetos quedan en blanco y el fondo en negro
     mostrar_imagen(
         binaria,
         "Paso 5, umbralización con Otsu",
@@ -373,15 +378,16 @@ def main():
 
 
 
+
     # ========================================================
-    # 7, Morfología
+    # 7, Limpiar la imagen binaria
     # ========================================================
 
     print("\n7, Morfología")
-    print("Se limpia la máscara binaria con apertura y cierre")
-    print("La apertura elimina ruido pequeño y el cierre ayuda a rellenar huecos internos")
+    print("Este paso limpia la imagen en blanco y negro")
+    print("Ayuda a quitar manchas pequeñas y a completar partes de los objetos")
 
-    # Se aplica morfología sobre la imagen binaria
+    # Se limpia la imagen binaria
     binaria_limpia = aplicar_morfologia(
         binaria,
         kernel_size=5,
@@ -389,7 +395,7 @@ def main():
         cierre_iter=1
     )
 
-    # Se compara la máscara de Otsu contra la máscara limpia
+    # Se compara la imagen antes y después de limpiarla
     mostrar_comparacion(
         binaria,
         binaria_limpia,
@@ -409,29 +415,30 @@ def main():
 
 
 
+
     # ========================================================
-    # 8, Segmentación por componentes conectados
+    # 8, Contar objetos
     # ========================================================
 
     print("\n8, Segmentación por componentes conectados")
-    print("Cada región blanca válida se interpreta como un objeto")
-    print("El parámetro area_minima evita contar ruido pequeño")
+    print("Aquí se buscan las zonas blancas que representan objetos")
+    print("Las zonas muy pequeñas se ignoran para no contar ruido")
 
-    # Se segmentan las regiones conectadas
-    # resultado contiene la imagen con cajas y centroides
-    # conteo contiene el número de objetos detectados
-    # tabla contiene propiedades, pero no se imprimirá para no saturar la exposición
-    # labels contiene la matriz de etiquetas
+    # Se buscan las regiones blancas de la imagen limpia
+    # resultado es la imagen con cajas y puntos verdes
+    # conteo es el número de objetos encontrados
+    # tabla guarda datos de cada objeto, pero no se imprimirá completa
+    # labels guarda las etiquetas internas de cada región
     resultado, conteo, tabla, labels = segmentar_componentes(
         binaria_limpia,
         img_rgb,
         area_minima=2000
     )
 
-    # Se imprime solo el conteo final
+    # Se muestra solo el número final de objetos
     print("\nConteo final:", conteo)
 
-    # Se muestra la imagen final con cajas, centroides y número de objetos
+    # Se muestra la imagen final con cajas, puntos verdes y números
     mostrar_resultado_final(
         resultado,
         conteo
@@ -447,23 +454,23 @@ def main():
 
 
 
+
     # ========================================================
-    # 9, Detección de bordes con Canny
+    # 9, Detectar bordes
     # ========================================================
 
     print("\n9, Detección de bordes con Canny")
-    print("Se detectan contornos externos e internos de los objetos")
-    print("Esta etapa complementa el análisis geométrico")
+    print("Este paso muestra los contornos de los objetos")
+    print("Sirve como apoyo para ver mejor la forma de las piezas")
 
-    # Se aplica Canny sobre la imagen ecualizada
-    # La ecualización ayuda a resaltar bordes y detalles
+    # Se detectan los bordes de la imagen
     bordes = detectar_bordes_canny(
         gray_eq,
         umbral1=50,
         umbral2=150
     )
 
-    # Se muestra la imagen de bordes
+    # Se muestra la imagen con bordes
     mostrar_imagen(
         bordes,
         "Paso 8, detección de bordes con Canny",
@@ -480,23 +487,22 @@ def main():
 
 
 
+
     # ========================================================
-    # 10, Detección de esquinas con Harris
+    # 10, Detectar esquinas
     # ========================================================
 
     print("\n10, Detección de esquinas con Harris")
-    print("Se detectan puntos candidatos a esquina o zonas de alta variación")
-    print("Esta etapa es complementaria, no se usa para el conteo principal")
+    print("Este paso marca zonas donde hay cambios fuertes en la imagen")
+    print("No se usa para contar objetos, solo sirve como apoyo visual")
 
-    # Se aplica Harris sobre la imagen ecualizada
-    # harris contiene la respuesta numérica del detector
-    # harris_vis contiene la imagen con puntos marcados
+    # Se buscan puntos candidatos a esquina
     harris, harris_vis = detectar_esquinas_harris(
         gray_eq,
         img_rgb
     )
 
-    # Se muestra la imagen con puntos candidatos a esquina
+    # Se muestra la imagen con los puntos marcados
     mostrar_imagen(
         harris_vis,
         "Paso 9, detección de esquinas con Harris"
@@ -512,16 +518,16 @@ def main():
 
 
 
+
     # ========================================================
-    # 11, Prueba del pipeline automático
+    # 11, Probar el proceso automático
     # ========================================================
 
     print("\n11, Prueba del pipeline automático")
-    print("Ahora se ejecuta el flujo completo usando una sola función")
-    print("Esta prueba demuestra que la librería también funciona de forma automática")
+    print("Ahora se prueba la función que hace todo el proceso de una vez")
+    print("Esto demuestra que la librería también puede usarse de forma rápida")
 
-    # Se ejecuta el pipeline completo sin guardar CSV
-    # mostrar=True permite ver las etapas generadas por la función procesar_demo
+    # Se ejecuta el proceso completo con una sola función
     resultados_pipeline = procesar_demo(
         nombre_imagen,
         area_minima=2000,
@@ -529,7 +535,7 @@ def main():
         guardar_csv=False
     )
 
-    # Se imprime solo el conteo obtenido por el pipeline
+    # Se muestra solo el conteo que dio el proceso automático
     print("\nConteo obtenido con procesar_demo:", resultados_pipeline["conteo"])
 
     pausar()
@@ -542,19 +548,19 @@ def main():
 
 
 
+
     # ========================================================
-    # 12, Prueba rápida con todas las imágenes demo
+    # 12, Probar todas las imágenes demo
     # ========================================================
 
     print("\n12, Prueba rápida con todas las imágenes demo")
-    print("Esto demuestra que la librería no depende de una sola imagen")
-    print("Solo se mostrarán los conteos, no las tablas")
+    print("Esto demuestra que la librería puede trabajar con varias imágenes")
+    print("Solo se mostrarán los conteos para no saturar la pantalla")
 
-    # Se recorre cada imagen demo disponible
+    # Se procesa cada imagen demo disponible
     for nombre in imagenes:
 
-        # Se procesa cada imagen sin mostrar resultados visuales
-        # Esto permite probar rápido que el pipeline funciona con todas
+        # Se ejecuta el proceso completo sin mostrar imágenes
         resultado_demo = procesar_demo(
             nombre,
             area_minima=2000,
@@ -562,7 +568,7 @@ def main():
             guardar_csv=False
         )
 
-        # Se imprime el conteo obtenido para cada imagen
+        # Se muestra el conteo obtenido en cada imagen
         print(f"Imagen {nombre}, conteo detectado: {resultado_demo['conteo']} objetos")
 
 
@@ -573,12 +579,13 @@ def main():
 
 
 
+
     # ========================================================
-    # 13, Cierre de demostración
+    # 13, Cierre del ejemplo
     # ========================================================
 
     print("\n====================================================")
-    print(" DEMOSTRACIÓN FINALIZADA CORRECTAMENTE")
+    print(" EJEMPLO FINALIZADO CORRECTAMENTE")
     print("====================================================")
 
 
@@ -589,8 +596,9 @@ def main():
 
 
 
+
 # ============================================================
-# EJECUCIÓN DEL PROGRAMA
+# EJECUTAR EL PROGRAMA
 # ============================================================
 
 if __name__ == "__main__":
@@ -611,35 +619,35 @@ Carga una imagen demo incluida en el paquete y devuelve la imagen en formato BGR
 
 ### `convertir_a_gris(imagen)`
 
-Convierte una imagen de color a escala de grises para simplificar el procesamiento.
+Convierte una imagen de color a escala de grises para trabajarla de forma más sencilla.
 
 ### `filtrar_gaussiano(imagen_gris, kernel_size, sigma)`
 
-Aplica suavizado gaussiano para reducir ruido y pequeñas variaciones de textura.
+Suaviza la imagen para reducir detalles pequeños que pueden afectar el conteo.
 
 ### `ecualizar_histograma(imagen_gris)`
 
-Mejora el contraste de la imagen mediante una transformación de intensidad.
+Mejora el contraste para que algunas diferencias de brillo se vean con más claridad.
 
 ### `umbralizar_otsu(imagen_gris, invertir=True)`
 
-Calcula automáticamente un umbral para separar objetos y fondo, en el demo se usa sobre la imagen filtrada para evitar que los objetos se unan.
+Separa los objetos del fondo mediante un valor calculado automáticamente.
 
 ### `aplicar_morfologia(imagen_binaria, kernel_size, apertura_iter, cierre_iter)`
 
-Limpia la imagen binaria mediante apertura y cierre morfológico.
+Limpia la imagen en blanco y negro para reducir manchas pequeñas y completar partes de los objetos.
 
 ### `segmentar_componentes(imagen_binaria, imagen_rgb, area_minima)`
 
-Detecta regiones conectadas, cuenta objetos y genera una salida visual con cajas y centroides.
+Busca las regiones que representan objetos, calcula el conteo y genera la imagen final con cajas y centroides.
 
 ### `detectar_bordes_canny(imagen_gris, umbral1, umbral2)`
 
-Detecta bordes externos e internos de los objetos.
+Muestra los contornos de los objetos para observar mejor sus formas.
 
 ### `detectar_esquinas_harris(imagen_gris, imagen_rgb)`
 
-Detecta puntos candidatos a esquina o zonas de alta variación de intensidad.
+Marca zonas donde hay cambios fuertes en la imagen, se usa como apoyo visual y no como conteo principal.
 
 ### `mostrar_imagen(imagen, titulo, cmap)`
 
@@ -647,33 +655,33 @@ Muestra una imagen individual con un título.
 
 ### `mostrar_comparacion(imagen1, imagen2, titulo1, titulo2, cmap1, cmap2)`
 
-Muestra dos imágenes lado a lado para comparar etapas del procesamiento.
+Muestra dos imágenes lado a lado para comparar el antes y el después de una etapa.
 
 ### `mostrar_resultado_final(resultado, conteo)`
 
-Muestra la salida final con cajas, centroides y conteo total.
+Muestra la imagen final con cajas, puntos verdes, números y conteo total.
 
 ### `procesar_demo(nombre_imagen, area_minima, mostrar, guardar_csv)`
 
-Ejecuta el flujo completo de forma automática con una imagen demo.
+Ejecuta todo el proceso de manera automática con una imagen demo.
 
 ---
 
 ## Resultado esperado
 
-Al ejecutar el script de demostración con la imagen `img3`, el sistema debe mostrar el procesamiento paso por paso y obtener el conteo final de objetos detectados.
+Al ejecutar el ejemplo con la imagen `img3`, el programa muestra el procesamiento paso por paso y obtiene el conteo final de los objetos detectados.
 
-En la imagen principal del proyecto se espera detectar 9 objetos, siempre que la umbralización principal se aplique sobre la imagen filtrada `blur`.
+En la imagen principal del proyecto se espera detectar 9 objetos, siempre que la separación principal se haga usando la imagen filtrada `blur`.
 
 ---
 
 ## Limitaciones
 
-El método funciona mejor cuando los objetos están separados y existe contraste claro entre objetos y fondo.
+El método funciona mejor cuando los objetos están separados y existe buen contraste entre los objetos y el fondo.
 
-Si los objetos están pegados, tienen sombras fuertes, reflejos, marcas de agua o texturas muy intensas, algunas regiones pueden unirse o dividirse incorrectamente.
+Si los objetos están pegados, tienen sombras fuertes, reflejos, marcas de agua o texturas muy marcadas, algunas regiones pueden unirse o separarse de forma incorrecta.
 
-La detección de Harris puede marcar muchos puntos en objetos oxidados o con textura, por eso se usa como análisis complementario y no como método principal de conteo.
+La detección de Harris puede marcar muchos puntos en objetos con óxido o textura, por eso se usa como apoyo visual y no como método principal de conteo.
 
 ---
 
@@ -690,4 +698,3 @@ Andrés Eduardo Gloria Márquez
 Asignatura, Visión Robótica  
 Carrera, Ingeniería Robótica  
 Mayo de 2026
-
